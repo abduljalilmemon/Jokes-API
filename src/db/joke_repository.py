@@ -1,3 +1,6 @@
+from loguru import logger
+from sqlalchemy.exc import IntegrityError
+
 from models import Joke
 
 
@@ -9,9 +12,21 @@ class JokeRepository:
         return self.session.query(Joke).filter_by(category=category).all()
 
     def add(self, joke):
-        self.session.add(joke)
-        self.session.commit()
+        try:
+            self.session.add(joke)
+            self.session.commit()
+            return
+        except IntegrityError as i:
+            logger.warning(f'Duplicate joke: {joke.body}')
+        except Exception as e:
+            logger.error(e)
+        self.session.rollback()
 
     def delete(self, joke):
-        self.session.delete(joke)
-        self.session.commit()
+        try:
+            self.session.delete(joke)
+            self.session.commit()
+            return
+        except Exception as e:
+            logger.error(e)
+        self.session.rollback()

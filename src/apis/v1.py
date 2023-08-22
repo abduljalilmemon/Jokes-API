@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from utils import add_joke
 
 v1 = APIRouter(prefix='/v1')
 
@@ -18,6 +19,7 @@ async def get_joke_from_category():
     return "TBD"
 
 
-@v1.get('/submit')
-async def add_joke():
-    return "TBD"
+@v1.post('/submit')
+async def _add_joke(joke: str, category: str):
+    add_joke(joke, category)
+    return True

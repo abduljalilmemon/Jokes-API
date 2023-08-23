@@ -1,4 +1,5 @@
 from loguru import logger
+from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 
 from models import Joke
@@ -8,8 +9,15 @@ class JokeRepository:
     def __init__(self, session):
         self.session = session
 
-    def get_by_category(self, category):
-        return self.session.query(Joke).filter_by(category=category).all()
+    def get_random_joke(self, limit=1):
+        return self.session.query(Joke).order_by(func.rand()).limit(limit)
+
+    def get_by_category(self, category, offset: int, limit: int):
+        return self.session.query(Joke).filter_by(category=category).offset(
+            offset).limit(limit)
+
+    def search(self, phrase):
+        return self.session.query(Joke).filter(Joke.body.contains(phrase)).all()
 
     def add(self, joke):
         try:

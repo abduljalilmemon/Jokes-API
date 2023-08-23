@@ -1,12 +1,17 @@
 from fastapi import APIRouter
-from utils import add_joke
-
+from utils import add_joke, get_random_joke
+from loguru import logger
 v1 = APIRouter(prefix='/v1')
 
 
 @v1.get('/random')
-async def get_random_joke():
-    return "TBD"
+def _get_random_joke():
+    try:
+        resp = get_random_joke()
+        return resp
+    except Exception as e:
+        logger.error(e)
+    return False
 
 
 @v1.get('/lookup')

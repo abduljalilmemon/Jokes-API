@@ -22,3 +22,8 @@ def search_joke(phrase: str):
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
+def get_joke_from_category(category: str, offset: int, limit: int):
+    joke_repository = JokeRepository(session)
+    jokes = joke_repository.get_by_category(category=category.lower(),
+                                            offset=offset, limit=limit)
+    return [{"joke": joke.body, "category": joke.category} for joke in jokes]

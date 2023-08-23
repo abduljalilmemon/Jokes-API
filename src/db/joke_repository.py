@@ -15,6 +15,9 @@ class JokeRepository:
     def get_by_category(self, category):
         return self.session.query(Joke).filter_by(category=category).all()
 
+    def search(self, phrase):
+        return self.session.query(Joke).filter(Joke.body.contains(phrase)).all()
+
     def add(self, joke):
         try:
             self.session.add(joke)

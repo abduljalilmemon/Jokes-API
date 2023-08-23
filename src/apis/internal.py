@@ -12,4 +12,4 @@ async def migrate_json_to_mysql():
         return JSONResponse(status_code=200)
     except Exception as e:
         logger.error(e)
-    return JSONResponse(status_code=500)
+    return JSONResponse(content={}, status_code=500)

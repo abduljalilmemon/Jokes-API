@@ -16,3 +16,9 @@ def get_random_joke():
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
+def search_joke(phrase: str):
+    joke_repository = JokeRepository(session)
+    jokes = joke_repository.search(phrase=phrase)
+    return [{"joke": joke.body, "category": joke.category} for joke in jokes]
+
+

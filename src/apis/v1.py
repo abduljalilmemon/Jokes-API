@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from utils import add_joke, get_random_joke
+from utils import add_joke, get_random_joke, search_joke
 from loguru import logger
 
 v1 = APIRouter(prefix='/v1')
@@ -13,12 +13,17 @@ def _get_random_joke():
         return JSONResponse(content=joke, status_code=200)
     except Exception as e:
         logger.error(e)
-    return JSONResponse(status_code=500)
+    return JSONResponse(content={}, status_code=500)
 
 
 @v1.get('/lookup')
-async def get_lookup_joke():
-    return "TBD"
+def get_lookup_joke(phrase: str):
+    try:
+        joke = search_joke(phrase=phrase)
+        return JSONResponse(content=joke, status_code=200)
+    except Exception as e:
+        logger.error(e)
+    return JSONResponse(content={}, status_code=500)
 
 
 @v1.get('/category')
@@ -33,4 +38,4 @@ async def _add_joke(joke: str, category: str):
         return JSONResponse(status_code=200)
     except Exception as e:
         logger.error(e)
-    return JSONResponse(status_code=500)
+    return JSONResponse(content={}, status_code=500)

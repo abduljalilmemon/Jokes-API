@@ -8,6 +8,8 @@ from uuid import uuid4
 from auth.auth_handler import get_hashed_password
 from fastapi.responses import JSONResponse
 
+joke_repository = JokeRepository(session=session)
+
 
 def create_user(data: UserAuth):
     user = USERS.get(data.email)
@@ -36,32 +38,27 @@ def auth_user(username, password):
 
 def add_joke(joke: str, category: str):
     new_joke = Joke(body=joke, category=category)
-    joke_repository = JokeRepository(session)
     joke_repository.add(new_joke)
     return True
 
 
 def get_random_joke(limit: int = 1):
-    joke_repository = JokeRepository(session)
     jokes = joke_repository.get_random_joke(limit)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
 def search_joke(phrase: str, offset: int = 0, limit: int = 1):
-    joke_repository = JokeRepository(session)
     jokes = joke_repository.search(phrase=phrase, limit=limit, offset=offset)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
 def get_joke_from_category(category: str, offset: int = 0, limit: int = 1):
-    joke_repository = JokeRepository(session)
     jokes = joke_repository.get_by_category(category=category.lower(),
                                             offset=offset, limit=limit)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
 def get_unapproved_jokes(offset: int, limit: int):
-    joke_repository = JokeRepository(session)
     kwargs = {"approved": False}
     jokes = joke_repository.get(offset=offset, limit=limit, kwargs=kwargs)
     return [{"joke": joke.body, "category": joke.category, "id": joke.id} for
@@ -69,5 +66,9 @@ def get_unapproved_jokes(offset: int, limit: int):
 
 
 def approve_joke(_id: str):
-    joke_repository = JokeRepository(session)
     return joke_repository.approve(_id=_id)
+
+
+def get_all_categories():
+    categories = joke_repository.get_all_categories()
+    return [category.tuple()[0] for category in categories]

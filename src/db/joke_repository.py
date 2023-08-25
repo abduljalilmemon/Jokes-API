@@ -2,11 +2,22 @@ from loguru import logger
 from sqlalchemy import and_
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
-
 from models import Joke
 
 
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args,
+                                                                 **kwargs)
+        return cls._instances[cls]
+
+
 class JokeRepository:
+    __metaclass__ = Singleton
+
     def __init__(self, session):
         self.session = session
 
@@ -26,6 +37,10 @@ class JokeRepository:
         return self.session.query(Joke).filter(
             and_(Joke.body.contains(phrase), Joke.approved == True)).offset(
             offset).limit(limit)
+
+    def get_all_categories(self):
+        return self.session.query(Joke.category).filter(
+            Joke.approved == True).distinct().all()
 
     def add(self, joke):
         try:
@@ -48,5 +63,12 @@ class JokeRepository:
         self.session.rollback()
 
     def approve(self, _id):
-        return self.session.query(Joke).filter_by(id=_id).update(
-            {"approved": True})
+        try:
+            resp = self.session.query(Joke).filter_by(id=_id).update(
+                {"approved": True})
+            self.session.commit()
+            return resp
+        except Exception as e:
+            logger.error(e)
+        self.session.rollback()
+        return 0

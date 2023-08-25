@@ -15,3 +15,8 @@ class UserLogin(BaseModel):
     email: str = Field(..., description="user email")
     password: SecretStr = Form(..., min_length=5, max_length=24,
                                description="user password")
+
+
+class JokeSchema(BaseModel):
+    joke: str = Field(default="write your joke here")
+    category: str = Field(default="category")

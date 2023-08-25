@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from utils import add_joke, get_random_joke, search_joke, \
-    get_joke_from_category, auth_user, create_user
+    get_joke_from_category, auth_user, create_user, get_all_categories
 from loguru import logger
-from schemas import UserAuth, UserLogin
+from schemas import UserAuth, UserLogin, JokeSchema
 
 v1 = APIRouter(prefix='/free')
 user = APIRouter(prefix='/user')
@@ -68,10 +68,22 @@ async def _get_joke_from_category(category: str):
     return JSONResponse(content={}, status_code=500)
 
 
-@v1.post('/submit')
-async def _add_joke(joke: str, category: str):
+@v1.get('/all-categories')
+async def _get_all_categories():
     try:
-        add_joke(joke, category)
+        jokes = get_all_categories()
+        if len(jokes) > 0:
+            return JSONResponse(content=jokes, status_code=200)
+        return JSONResponse(content=jokes, status_code=404)
+    except Exception as e:
+        logger.error(e)
+    return JSONResponse(content={}, status_code=500)
+
+
+@v1.post('/submit')
+async def _add_joke(joke: JokeSchema):
+    try:
+        add_joke(joke=joke.joke, category=joke.category)
         return JSONResponse(content={"message": "joke added successfully"},
                             status_code=200)
     except Exception as e:

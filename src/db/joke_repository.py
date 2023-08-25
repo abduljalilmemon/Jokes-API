@@ -39,7 +39,8 @@ class JokeRepository:
             offset).limit(limit)
 
     def get_all_categories(self):
-        return self.session.query(Joke.category).distinct().all()
+        return self.session.query(Joke.category).filter(
+            Joke.approved == True).distinct().all()
 
     def add(self, joke):
         try:
@@ -62,5 +63,12 @@ class JokeRepository:
         self.session.rollback()
 
     def approve(self, _id):
-        return self.session.query(Joke).filter_by(id=_id).update(
-            {"approved": True})
+        try:
+            resp = self.session.query(Joke).filter_by(id=_id).update(
+                {"approved": True})
+            self.session.commit()
+            return resp
+        except Exception as e:
+            logger.error(e)
+        self.session.rollback()
+        return 0

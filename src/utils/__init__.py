@@ -36,3 +36,17 @@ def get_joke_from_category(category: str, offset: int, limit: int):
     jokes = joke_repository.get_by_category(category=category.lower(),
                                             offset=offset, limit=limit)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
+
+
+def get_unapproved_jokes(offset: int, limit: int):
+    joke_repository = JokeRepository(session)
+    kwargs = {"approved": False}
+    jokes = joke_repository.get(offset=offset, limit=limit, kwargs=kwargs)
+    return [{"joke": joke.body, "category": joke.category, "id": joke.id} for
+            joke in jokes]
+
+
+def approve_joke(_id: str):
+    joke_repository = JokeRepository(session)
+    return joke_repository.approve(_id=_id)
+

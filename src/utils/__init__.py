@@ -19,19 +19,19 @@ def add_joke(joke: str, category: str):
     return True
 
 
-def get_random_joke():
+def get_random_joke(limit: int = 1):
     joke_repository = JokeRepository(session)
-    jokes = joke_repository.get_random_joke()
+    jokes = joke_repository.get_random_joke(limit)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
-def search_joke(phrase: str):
+def search_joke(phrase: str, offset: int = 0, limit: int = 1):
     joke_repository = JokeRepository(session)
-    jokes = joke_repository.search(phrase=phrase)
+    jokes = joke_repository.search(phrase=phrase, limit=limit, offset=offset)
     return [{"joke": joke.body, "category": joke.category} for joke in jokes]
 
 
-def get_joke_from_category(category: str, offset: int, limit: int):
+def get_joke_from_category(category: str, offset: int = 0, limit: int = 1):
     joke_repository = JokeRepository(session)
     jokes = joke_repository.get_by_category(category=category.lower(),
                                             offset=offset, limit=limit)
@@ -49,4 +49,3 @@ def get_unapproved_jokes(offset: int, limit: int):
 def approve_joke(_id: str):
     joke_repository = JokeRepository(session)
     return joke_repository.approve(_id=_id)
-

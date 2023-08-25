@@ -10,7 +10,7 @@ class JokeRepository:
     def __init__(self, session):
         self.session = session
 
-    def get_random_joke(self, limit=1):
+    def get_random_joke(self, limit: int):
         return self.session.query(Joke).filter_by(approved=True).order_by(
             func.rand()).limit(limit)
 
@@ -19,11 +19,13 @@ class JokeRepository:
             category=category, approved=True).offset(offset).limit(limit)
 
     def get(self, offset: int, limit: int, kwargs):
-        return self.session.query(Joke).filter_by(**kwargs).offset(offset).limit(limit)
+        return self.session.query(Joke).filter_by(**kwargs).offset(
+            offset).limit(limit)
 
-    def search(self, phrase):
+    def search(self, phrase: str, offset: int, limit: int):
         return self.session.query(Joke).filter(
-            and_(Joke.body.contains(phrase), Joke.approved == True)).all()
+            and_(Joke.body.contains(phrase), Joke.approved == True)).offset(
+            offset).limit(limit)
 
     def add(self, joke):
         try:

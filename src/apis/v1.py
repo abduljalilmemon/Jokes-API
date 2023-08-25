@@ -1,16 +1,29 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from utils import add_joke, get_random_joke, search_joke, \
-    get_joke_from_category, auth_user
+    get_joke_from_category, auth_user, create_user
 from loguru import logger
+from schemas import UserAuth, UserLogin
 
 v1 = APIRouter(prefix='/free')
+user = APIRouter(prefix='/user')
 
 
-@v1.post("/user/login")
-def user_sign(username: str, password: str):
+@user.post('/signup')
+async def signup(data: UserAuth = Depends()):
     try:
-        user, response = auth_user(username=username, password=password)
+        response = create_user(data=data)
+        return response
+    except Exception as e:
+        logger.error(e)
+    return JSONResponse(content={}, status_code=500)
+
+
+@user.post('/login')
+async def login(data: UserLogin = Depends()):
+    try:
+        user, response = auth_user(username=data.email,
+                                   password=data.password.get_secret_value())
         if user:
             return JSONResponse(content=response, status_code=200)
         return JSONResponse(content=response, status_code=404)
@@ -19,6 +32,7 @@ def user_sign(username: str, password: str):
     return JSONResponse(content={}, status_code=500)
 
 
+@v1.get('/random')
 def _get_random_joke():
     try:
         joke = get_random_joke()

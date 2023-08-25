@@ -10,3 +10,9 @@ def generate_token(user_id: str):
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {"access_token": token}
+
+
+def decode_token(token: str):
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return decoded_token if decoded_token.get("expires", (
+                time.time() + 10)) >= time.time() else None

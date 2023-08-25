@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from auth.auth_bearer import JWTBearer
 from utils import add_joke, get_random_joke, search_joke, get_joke_from_category, auth_user
 from loguru import logger
 
@@ -18,7 +19,7 @@ def user_sign(username: str, password: str):
     return JSONResponse(content={}, status_code=500)
 
 
-@v1.get('/random')
+@v1.get('/random', dependencies=[Depends(JWTBearer())])
 def _get_random_joke():
     try:
         joke = get_random_joke()

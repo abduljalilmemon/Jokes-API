@@ -1,6 +1,15 @@
 from db import session
 from db.joke_repository import JokeRepository
 from models import Joke
+from config import USERS
+from auth.auth_handler import generate_token
+
+
+def auth_user(username, password):
+    user = USERS.get(username)
+    if user and (user.get("password") == password):
+        return True, generate_token(username)
+    return False, "username or password is invalid"
 
 
 def add_joke(joke: str, category: str):

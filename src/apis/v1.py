@@ -1,9 +1,21 @@
 from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
-from utils import add_joke, get_random_joke, search_joke, get_joke_from_category
+from utils import add_joke, get_random_joke, search_joke, get_joke_from_category, auth_user
 from loguru import logger
 
 v1 = APIRouter(prefix='/v1')
+
+
+@v1.post("/user/login")
+def user_sign(username: str, password: str):
+    try:
+        user, response = auth_user(username=username, password=password)
+        if user:
+            return JSONResponse(content=response, status_code=200)
+        return JSONResponse(content=response, status_code=404)
+    except Exception as e:
+        logger.error(e)
+    return JSONResponse(content={}, status_code=500)
 
 
 @v1.get('/random')

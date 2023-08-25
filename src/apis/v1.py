@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from utils import add_joke, get_random_joke, search_joke, \
-    get_joke_from_category, auth_user, create_user
+    get_joke_from_category, auth_user, create_user, get_all_categories
 from loguru import logger
 from schemas import UserAuth, UserLogin
 
@@ -60,6 +60,19 @@ def get_lookup_joke(phrase: str):
 async def _get_joke_from_category(category: str):
     try:
         jokes = get_joke_from_category(category=category)
+        if len(jokes) > 0:
+            return JSONResponse(content=jokes, status_code=200)
+        return JSONResponse(content=jokes, status_code=404)
+    except Exception as e:
+        logger.error(e)
+    return JSONResponse(content={}, status_code=500)
+
+
+@v1.get('/all-categories')
+async def _get_all_categories():
+    try:
+        jokes = get_all_categories()
+        print(jokes)
         if len(jokes) > 0:
             return JSONResponse(content=jokes, status_code=200)
         return JSONResponse(content=jokes, status_code=404)
